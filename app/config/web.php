@@ -21,10 +21,11 @@ $config = [
             'showScriptName' => true,
             'enableStrictParsing' => true,
             'rules' => [
-                '/' => 'site/login',
+                
                 '<controller:\w+>/<id:\d+>'=>'<controller>/index',
                 '<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
                 '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
+                
             ]
         ],
         'user' => [
