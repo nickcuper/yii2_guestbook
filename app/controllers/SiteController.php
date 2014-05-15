@@ -49,7 +49,11 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        return $this->render('index');
+        $model = new LoginForm();
+        
+        return $this->render('login', [
+                'model' => $model,
+            ]);
     }
 
     public function actionLogin()
@@ -92,5 +96,28 @@ class SiteController extends Controller
     public function actionAbout()
     {
         return $this->render('about');
+    }
+    
+    public function actionRegister() 
+    {
+        
+        return $this->render('register');
+        
+    }
+    
+    public function actionFogotPassword() 
+    {
+        
+        
+    }
+    
+    public function actionResetPassword() 
+    {
+        
+    }
+    
+    public function actionActivateAccount() 
+    {
+        
     }
 }
