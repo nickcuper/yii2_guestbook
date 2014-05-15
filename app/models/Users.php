@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "users".
+ * This is the model class for table "user".
  *
  * @property string $user_id
  * @property string $login
@@ -13,7 +13,6 @@ use Yii;
  * @property string $email
  * @property string $fname
  * @property string $lname
- * @property string $vname
  * @property integer $is_active
  * @property integer $role_id
  * @property integer $state_id
@@ -33,7 +32,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'users';
+        return 'user';
     }
 
     /**
@@ -47,7 +46,7 @@ class Users extends \yii\db\ActiveRecord
             [['login', 'email', 'address'], 'string', 'max' => 255],
             [['password'], 'string', 'max' => 32],
             [['fname', 'lname', 'city'], 'string', 'max' => 80],
-            [['vname', 'phone_cell', 'phone_work'], 'string', 'max' => 20],
+            [['phone_cell', 'phone_work'], 'string', 'max' => 20],
             [['zip'], 'string', 'max' => 10],
             [['login'], 'unique'],
             [['email'], 'unique']
@@ -66,7 +65,6 @@ class Users extends \yii\db\ActiveRecord
             'email' => Yii::t('app', 'Email'),
             'fname' => Yii::t('app', 'Fname'),
             'lname' => Yii::t('app', 'Lname'),
-            'vname' => Yii::t('app', 'Vname'),
             'is_active' => Yii::t('app', 'Is Active'),
             'role_id' => Yii::t('app', 'Role ID'),
             'state_id' => Yii::t('app', 'State ID'),
