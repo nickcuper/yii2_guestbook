@@ -32,18 +32,38 @@ AppAsset::register($this);
                     'class' => 'navbar-inverse navbar-fixed-top',
                 ],
             ]);
+
+            if (Yii::$app->user->isGuest) {
+                $menuItems = [
+                    ['label' => 'Register', 'url' => ['/signup']],
+                    ['label' => 'Login', 'url' => ['/login']]
+                ];
+                
+            } else {
+                $menuItems = [
+                    [
+                        'label' => Yii::t('users', 'My Account'),
+                        'url' => ['/users/default/update'],
+                    ],
+                    [
+                        'label' => Yii::t('users', 'My GuestBook'),
+                        'url' => ['/guestbook'],
+                    ],
+                    [
+                        'label' => Yii::t('users', 'My Partners'),
+                        'url' => ['/partners'],
+                    ],
+                    [
+                        'label' => 'Logout (' . Yii::$app->user->identity->login . ')',
+                        'url' => ['/logout'],
+                    ]
+                ];
+                
+            }
+             
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-right'],
-                'items' => [
-                    ['label' => 'Register', 'url' => ['/site/register']],
-                    ['label' => 'About', 'url' => ['/site/about']],
-                    ['label' => 'Contact', 'url' => ['/site/contact']],
-                    Yii::$app->user->isGuest ?
-                        ['label' => 'Login', 'url' => ['/site/login']] :
-                        ['label' => 'Logout (' . Yii::$app->user->identity->username . ')',
-                            'url' => ['/site/logout'],
-                            'linkOptions' => ['data-method' => 'post']],
-                ],
+                'items' => $menuItems,
             ]);
             NavBar::end();
         ?>

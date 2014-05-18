@@ -39,9 +39,8 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
     <?php ActiveForm::end(); ?>
-    
+
     <hr/>
-    
-    <a>Fogot Password</a>
-    
+    <?= Html::a('Fogot Password', '/site/fogotpassword') ?>
+
 </div>

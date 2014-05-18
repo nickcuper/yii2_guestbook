@@ -7,30 +7,54 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'extensions' => require(__DIR__ . '/../vendor/yiisoft/extensions.php'),
+    'modules' => [
+
+		'users' => [
+		    'class' => 'app\modules\users\Users'
+		],
+
+		'comments' => [
+			'class' => 'frontend\modules\comments\Comments'
+		]
+    ],
     'components' => [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
         'request' => [
-            'baseUrl' => '/app/web'
-        ],      
+            'baseUrl' => '/'
+        ],
         'urlManager' => [
-            'baseUrl' => '/app/web',
-            
+            'baseUrl' => '',
+
             'enablePrettyUrl' => true,
             'showScriptName' => true,
             'enableStrictParsing' => true,
             'rules' => [
-                
+
+                // Base Rules
+                '' => 'site/index',
+		'<_a:(about|contact|error|captcha|state)>' => 'site/<_a>',
                 '<controller:\w+>/<id:\d+>'=>'<controller>/index',
                 '<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
                 '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
+
+                // Module Users Rules
+                '<_a:(login|logout|signup|activation|recovery|resend|avatar|partners|guestbook)>' => 'users/default/<_a>',
+                'my/settings/<_a:[\w\-]+>' => 'users/default/<_a>',
+                '<_m:users>/<username:[a-zA-Z0-9_-]{3,20}+>' => '<_m>/default/view',
                 
+                
+                
+                
+
             ]
         ],
+
         'user' => [
-            'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
+                'class' => 'yii\web\User',
+                'identityClass' => 'app\modules\users\models\User',
+                'loginUrl' => ['/users/default/login']
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -39,6 +63,15 @@ $config = [
             'class' => 'yii\swiftmailer\Mailer',
             'useFileTransport' => true,
         ],
+        'i18n' => [
+			'translations' => [
+				'users' => [
+					'class' => 'yii\i18n\PhpMessageSource',
+					'sourceLanguage' => 'en',
+					'basePath' => 'app/modules/users/messages',
+				]
+			]
+		],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
