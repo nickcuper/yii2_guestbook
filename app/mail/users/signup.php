@@ -1,9 +1,9 @@
 <?php
 /**
- * Представление отправки активационного ключа.
- * @var yii\web\View $this Представление 
- * @var string $key Ключ активации
- * @var string $email Email адрес
+ * Send Activate key
+ * @var yii\web\View $this
+ * @var string $key
+ * @var string $email
  */
 
 use yii\helpers\Html;

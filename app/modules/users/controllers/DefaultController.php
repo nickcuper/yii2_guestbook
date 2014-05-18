@@ -6,10 +6,12 @@ use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\HttpException;
 use yii\web\Controller;
+use yii\web\Response;
 use yii\helpers\Url;
 
 // models
 use app\modules\users\models\User;
+use app\modules\users\models\Comment;
 use app\modules\users\models\LoginForm;
 
 // fileApi
@@ -34,7 +36,7 @@ class DefaultController extends Controller
 					],
 					[
 						'allow' => true,
-						'actions' => ['index', 'logout', 'request-email-change', 'password', 'update', 'guestbook'],
+						'actions' => ['index', 'logout', 'password', 'update', 'guestbook', 'partners', 'comments'],
 						'roles' => ['@']
 					],
 					[
@@ -93,7 +95,7 @@ class DefaultController extends Controller
 	/**
 	 * Show all Records
 	 */
-	function actionIndex()
+	function actionPartners()
 	{
 		$dataProvider = new ActiveDataProvider([
 			'query' => User::find()->mypartners(),
@@ -129,23 +131,22 @@ class DefaultController extends Controller
 	public function actionSignup()
 	{
 		$model = new User(['scenario' => 'signup']);
-		// Добавляем обработчик события который отправляет сообщение с клюом активации на e-mail адрес что был указан при регистрации.
+		// Add an event handler that sends a message with the activation key on the e-mail address that was specified during registration.
 		if ($this->module->activeAfterRegistration === false) {
 			$model->on(User::EVENT_AFTER_INSERT, [$this->module, 'onSignup']);
 		}
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			// Если после регистрации нужно подтвердить почтовый адрес, вызываем функцию отправки кода активации на почту.
+			// If needed activate account
 			if ($this->module->activeAfterRegistration === false) {
-				// Сообщаем пользователю что регистрация прошла успешно, и что на его e-mail был отправлен ключ активации аккаунта.
-				Yii::$app->session->setFlash('success', Yii::t('users', 'Учётная запись была успешно создана. Через несколько секунд вам на почту будет отправлен код для активации аккаунта. В случае если письмо не пришло в течении 15 минут, вы можете заново запросить отправку ключа по данной <a href="{url}">ссылке</a>. Спасибо!', ['url' => Url::toRoute('resend')]));
+				
+				Yii::$app->session->setFlash('success', Yii::t('users', 'Congratulations! Account was created and your email was sent mail with activation key'));
 			} else {
-				// Авторизуем сразу пользователя.
+				// Auth user and show message
 				Yii::$app->getUser()->login($model);
-				// Сообщаем пользователю что регистрация прошла успешно.
-				Yii::$app->session->setFlash('success', Yii::t('users', 'Account was created'));
+				Yii::$app->session->setFlash('success', Yii::t('users', 'Congratulations! Account was created'));
 			}
-			// User go to home
+			
 			return $this->goHome();
 		}
 		
@@ -155,11 +156,10 @@ class DefaultController extends Controller
 	}
 
 	/**
-	 * Авторизуем пользователя.
+	 * Auth user
 	 */
 	public function actionLogin()
 	{
-
 		if (!Yii::$app->user->isGuest) {
 			$this->goHome();
 		}
@@ -181,7 +181,6 @@ class DefaultController extends Controller
 	public function actionLogout()
 	{
 		Yii::$app->user->logout();
-		// redirect user 
 		return $this->redirect($this->module->afterLogoutRedirectUrl);
 	}
 
@@ -222,28 +221,28 @@ class DefaultController extends Controller
 				$mUser->on(User::EVENT_AFTER_UPDATE, [$this->module, 'onRecoveryPassword']);
 
 				if ($mUser->save(false)) {
-					// В случае успешного восстановления пароля, перенаправляем пользователя на главную страницу, и оповещаем пользователя об успешном завершении процесса восстановления.
-					Yii::$app->session->setFlash('success', Yii::t('users', 'Пароль был успешно восстановлен и отправлен на указанный электронный адрес. Проверьте пожалуйста почту!'));
+					// In case of a successful password recovery, redirect the user to the main page, and notifies the user about the successful completion of the recovery process.
+					Yii::$app->session->setFlash('success', Yii::t('users', 'Password has been successfully restored and sent to the specified email address. Please check the mail!'));
 				}
 			} else {
-				// В случае когда пользователь с передаными аргументами не существует в базе данных, оповещаем пользователя об ошибке.
+				// In case of the user with the given arguments do not exist in the database, alerting the user of the error.
 				Yii::$app->session->setFlash('danger', Yii::t('users', 'Неправильный запрос подтверждения смены пароля. Пожалуйста попробуйте ещё раз!'));
 			}
-			// Перенаправляем пользователя на главную страницу сайта.
+			
 			return $this->goHome();
 
-		// В случае когда $email и $key не заданы, прорабатывается сценарий непосредственного запроса восстановления пароля.
+		
 		} else {
 			$mUser = new User(['scenario' => 'recovery']);
-			// Добавляем обработчик события который отправляет сообщение с ключом подтверждения смены пароля на e-mail адрес пользователя.
+			// Add an event handler that sends a message with a key to the password change e-mail address of the user.
 			$mUser->on(User::EVENT_AFTER_VALIDATE_SUCCESS, [$this->module, 'onRecoveryConfirm']);
 
 			if ($mUser->load(Yii::$app->request->post()) && $mUser->validate()) {
-			    // Перенаправляем пользователя на главную страницу, и оповещаем его об успешном завершении запроса восставновления пароля.
+			    // Redirect the user to the main page, and it notifies the successful completion of the request Restitution password.
 			    Yii::$app->session->setFlash('success', Yii::t('users', 'Ссылка для восстановления пароля, была отправлена на указанный вами электронный адрес.'));
 			    return $this->goHome();
 			}
-			// Рендерим представление.
+			
 			return $this->render('recovery', [
 				'model' => $mUser
 			]);
@@ -260,9 +259,7 @@ class DefaultController extends Controller
 			$mUser->setScenario('update');
 
 			if ($mUser->load(Yii::$app->request->post()) && $mUser->save()) {
-				
 				Yii::$app->session->setFlash('success', Yii::t('users', 'Profile was updated'));
-				return $this->redirect(['view', 'username' => $mUser->login]);
 			}
 			
 			return $this->render('update', [
@@ -282,14 +279,61 @@ class DefaultController extends Controller
 	}
        
         /**
-         * Show my comments
+         * Show comment, if username is Null show my comments 
+         * @param string $username Login user
          */
-        public function actionGuestbook() 
+        public function actionGuestbook($username = null) 
         {
+
+                if ($username && $mUserByUsername = User::findActiveByLogin($username)) {
+                    $userId = $mUserByUsername->user_id;
+                } else {
+                    $userId = Yii::$app->user->id;
+                }
                 
-            
                 return $this->render('guestbook', [
-				'model' => null,
+				'user_id' => $userId,
+				'login' => $username,
 			]);
         }
+        
+        
+        /**
+	 * Create new comment
+	 */
+	public function actionComments()
+	{
+            
+		$model = new Comment(['scenario' => 'create']);
+		Yii::$app->response->format = Response::FORMAT_JSON;
+
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$level = Yii::$app->request->post('level');
+                        // if Answer to other comment
+			$isAnswer = Yii::$app->request->post('is_answer');
+			if ($level !== null) {
+				$level = ($level < $this->module->maxLevel)
+                                        ? $level + 1 : $this->module->maxLevel;
+			} else {
+				$level = 0;
+			}
+                        
+                        // TODO hard code remove later
+                        if (!$isAnswer) {
+                            Yii::$app->session->setFlash('success', Yii::t('users', 'Comment was added'));
+                            return $this->redirect('/guestbook');
+                        }
+                        
+			return [
+			    'success' => $this->renderPartial('@app/modules/users/widgets/comments/views/_index_item', [
+			    	'model' => $model,
+			    	'level' => $level,
+			    	'maxLevel' => $this->module->maxLevel
+			    ])
+			];
+                        
+		} else {
+			return ['errors' => ActiveForm::validate($model)];
+		}
+	}
 }

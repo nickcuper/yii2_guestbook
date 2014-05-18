@@ -8,7 +8,6 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
 
-use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\State;
 

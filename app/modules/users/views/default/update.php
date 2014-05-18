@@ -11,7 +11,7 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use app\extensions\fileapi\FileAPIAdvanced;
 
-$this->title = 'Profile Update';
+$this->title = Yii::t('users', 'Profile Update');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <h1><?php echo Html::encode($this->title); ?></h1>

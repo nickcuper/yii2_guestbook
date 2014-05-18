@@ -8,6 +8,6 @@
 use yii\helpers\Html;
 ?>
 <div class="user-avatar">
-    <?= Html::a(Html::img($model->avatar), ['view', 'username' => $model['username']]) ?>
+    <?= Html::a(Html::img($model->avatar), ['view', 'username' => $model['login']]) ?>
 </div>
-<h3><?= Html::a($model->fio, ['view', 'username' => $model['username']]) ?></h3>
+<h3><?= Html::a($model->fio, ['guestbook', 'username' => $model['login']]) ?></h3>

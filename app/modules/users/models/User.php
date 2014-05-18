@@ -7,8 +7,10 @@ use yii\db\ActiveRecord;
 use yii\helpers\Security;
 use yii\helpers\ArrayHelper;
 use \yii\web\IdentityInterface;
+
 use app\extensions\fileapi\behaviors\UploadBehavior;
-#use app\modules\comments\models\Comment;
+
+use app\modules\users\models\Comment;
 use app\modules\users\models\query\UserQuery;
 
 /**
@@ -53,7 +55,7 @@ class User extends ActiveRecord implements IdentityInterface
 	const EVENT_AFTER_VALIDATE_SUCCESS = 'afterValidateSuccess';
 
 	/**
-	 * Ключи кэша которые использует модель.
+	 * Key cache
 	 */
 	const CACHE_USERS_LIST_DATA = 'usersListData';
 
@@ -171,21 +173,21 @@ class User extends ActiveRecord implements IdentityInterface
 	public function attributeLabels()
 	{
 		return [
-			'user_id' => Yii::t('app', 'User ID'),
-                        'login' => Yii::t('app', 'Login'),
-                        'password' => Yii::t('app', 'Password'),
-                        'repassword' => Yii::t('app', 'Repeat Password'),
-                        'email' => Yii::t('app', 'Email'),
-                        'fname' => Yii::t('app', 'First Name'),
-                        'lname' => Yii::t('app', 'Last Name'),
-                        'is_active' => Yii::t('app', 'Is Active'),
-                        'role_id' => Yii::t('app', 'Role'),
-                        'state_id' => Yii::t('app', 'State'),
-                        'country_id' => Yii::t('app', 'Country'),
-                        'phone' => Yii::t('app', 'Phone'),
-                        'wmr' => Yii::t('app', 'WMR'),
-                        'avatar_url' => Yii::t('app', 'Avatar'),
-                        'date_register' => Yii::t('app', 'Date Register'),
+			'user_id' => Yii::t('users', 'User ID'),
+                        'login' => Yii::t('users', 'Login'),
+                        'password' => Yii::t('users', 'Password'),
+                        'repassword' => Yii::t('users', 'Repeat Password'),
+                        'email' => Yii::t('users', 'Email'),
+                        'fname' => Yii::t('users', 'First Name'),
+                        'lname' => Yii::t('users', 'Last Name'),
+                        'is_active' => Yii::t('users', 'Is Active'),
+                        'role_id' => Yii::t('users', 'Role'),
+                        'state_id' => Yii::t('users', 'State'),
+                        'country_id' => Yii::t('users', 'Country'),
+                        'phone' => Yii::t('users', 'Phone'),
+                        'wmr' => Yii::t('users', 'WMR'),
+                        'avatar_url' => Yii::t('users', 'Avatar'),
+                        'date_register' => Yii::t('users', 'Date Register'),
 		];
 	}
         
@@ -393,7 +395,7 @@ class User extends ActiveRecord implements IdentityInterface
 		}
 	}
 
-    /**
+        /**
 	 * @return \yii\db\ActiveRelation Comments User
 	 */
 	public function getComments()
@@ -465,24 +467,6 @@ class User extends ActiveRecord implements IdentityInterface
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function afterSave($insert)
-	{
-		// Удаляем все записи пользователя.
-		if ($this->scenario === 'delete') {
-			
-			if ($this->comments) {
-				foreach ($this->comments as $comment) {
-					$comment->setScenario('delete');
-					$comment->save(false);
-				}
-			}
-		}
-		parent::afterSave($insert);
 	}
         
         /**

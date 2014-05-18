@@ -54,6 +54,11 @@ class Users extends Module
 	 * @var integer Максимальный размер загружаемого аватар-а
 	 */
 	public $avatarMaxSize = 3145728; // 2*1024*1024 = 2MB
+        
+	/**
+	 * @var integer
+	 */
+	public $maxLevel = 1;
 
 	/**
 	 * @param string $image Имя изображения

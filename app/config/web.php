@@ -13,9 +13,9 @@ $config = [
 		    'class' => 'app\modules\users\Users'
 		],
 
-		'comments' => [
-			'class' => 'frontend\modules\comments\Comments'
-		]
+		'api' => [
+			'class' => 'app\modules\api\Api'
+		],
     ],
     'components' => [
         'cache' => [
@@ -32,22 +32,21 @@ $config = [
             'enableStrictParsing' => true,
             'rules' => [
 
-                // Base Rules
-                '' => 'site/index',
-		'<_a:(about|contact|error|captcha|state)>' => 'site/<_a>',
-                '<controller:\w+>/<id:\d+>'=>'<controller>/index',
-                '<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
-                '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
+                    // Base
+                    '' => 'site/index',
+                    '<_a:(about|contact|error|captcha|state)>' => 'site/<_a>',
+                    '<controller:\w+>/<id:\d+>'=>'<controller>/index',
+                    '<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
+                    '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 
-                // Module Users Rules
-                '<_a:(login|logout|signup|activation|recovery|resend|avatar|partners|guestbook)>' => 'users/default/<_a>',
-                'my/settings/<_a:[\w\-]+>' => 'users/default/<_a>',
-                '<_m:users>/<username:[a-zA-Z0-9_-]{3,20}+>' => '<_m>/default/view',
-                
-                
-                
-                
-
+                    // Module Users
+                    // Widget Comments [[ Modules User ]]
+                    
+                    '<_a:(login|logout|signup|activation|recovery|resend|avatar|partners|guestbook|comments)>' => 'users/default/<_a>',
+                    'my/settings/<_a:[\w\-]+>' => 'users/default/<_a>',
+                    '<_m:users>/<username:[a-zA-Z0-9_-]{3,20}+>' => '<_m>/default/view',
+                    
+                    
             ]
         ],
 
