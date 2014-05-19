@@ -8,16 +8,16 @@
 use yii\helpers\Html;
 
 $class = 'row comment lvl-' . $level;
-
+$relation = ($model['to']) ? 'reciever' : 'user';
 ?>
 
 <div class="<?= $class ?>" id="comment-<?= $model['comment_id'] ?>" data-parent="<?= $model['parent_id'] ?>">
 	<div class="col-sm-3">
-	    <?= Html::img($model->user->avatar) ?>
+	    <?= Html::img($model->$relation->avatar) ?>
 	</div>
 	<div class="col-sm-7">
 		<p class="author">
-			<?= $model->user->getFio(true) ?>
+			<?php echo $model->$relation->getFio(true);?>
 		</p>
 		<?php  if (Yii::$app->user->id != $model['from'] && !$model['parent_id']) { ?>
                     <p class="manage">

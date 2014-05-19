@@ -1,8 +1,8 @@
 <?php
 /**
- * Страница всех пользователей.
+ * Page of my partners
  * @var yii\base\View $this
- * @var common\modules\users\models\User $dataProvider
+ * @var app\modules\users\models\User $dataProvider
  */
 
 use yii\helpers\Html;

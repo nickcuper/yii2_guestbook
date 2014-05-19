@@ -49,6 +49,11 @@ class Comments extends Widget
         public $user_id;
         
         /**
+	 * @var boolean
+	 */
+        public $isAnswer;
+        
+        /**
 	 * @inheritdoc
 	 */
 	public function init()
@@ -107,8 +112,8 @@ class Comments extends Widget
   	protected function baseComment()
 	{
 		$model = new Comment(['scenario' => 'create']);
-                $model->from = ($this->user_id) ? $this->user_id : Yii::$app->user->id;
-                
+                $model->from = ($this->user_id) ? $this->user_id : Yii::$app->user->id;  
+                $model->to = (Yii::$app->user->id != $model->from) ? Yii::$app->user->id : 0;     
                 return $model;
 	}
 }

@@ -19,6 +19,7 @@ $form = ActiveForm::begin([
 ]);
     echo $form->field($model, 'body')->textarea() .
          Html::activeHiddenInput($model, 'from') .
+         Html::activeHiddenInput($model, 'to') .
          Html::activeHiddenInput($model, 'parent_id') .
          Html::hiddenInput('level', null, ['id' => 'comment-level']) .
          Html::hiddenInput('is_answer', $is_answer) .

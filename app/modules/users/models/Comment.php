@@ -14,7 +14,8 @@ use app\modules\users\models\query\CommentQuery;
  *
  * @property integer $comment_id
  * @property integer $parent_id
- * @property integer $from User.
+ * @property integer $to Reciver.
+ * @property integer $from Author.
  * @property staring $body
  * @property date $date_create
  * 
@@ -27,6 +28,11 @@ class Comment extends ActiveRecord
 	 */
 	const STATUS_UNREAD = 0;
         const STATUS_READ = 1;
+	
+        /**
+	 * Key count answer cache
+	 */
+	const CACHE_USER_COUNT_MESSAGE = 'newMessage';
         
 	/**
 	 * @var Uses for store structure 
@@ -79,7 +85,8 @@ class Comment extends ActiveRecord
 	 * Select All comments.
 	 * @return yii\db\ActiveRecord
 	 */
-	public function getComments() {
+	public function getComments() 
+        {
                 $comments = self::find()
                             ->where(['from' => $this->from])
                             ->orderBy(['parent_id' => 'ASC', 'date_create' => 'ASC'])
@@ -97,7 +104,8 @@ class Comment extends ActiveRecord
 	 * @param int $rootID parent_id
 	 * @return tree structure comments.
 	 */
-	protected function buildTree(&$data, $rootId = 0) {
+	protected function buildTree(&$data, $rootId = 0) 
+        {
                 $tree = [];
                 
                 foreach ($data as $id => $node) {
@@ -109,7 +117,7 @@ class Comment extends ActiveRecord
                     }
                 }
                 return $tree;
-    }
+        }
 
 	/**
 	 * @inheritdoc
@@ -128,7 +136,7 @@ class Comment extends ActiveRecord
 	public function scenarios()
 	{
 		return [
-			'create' => ['body', 'parent_id', 'from'],
+			'create' => ['body', 'parent_id', 'from', 'to'],
 			'update' => ['body'],
 			'delete' => ''
 		];
@@ -143,26 +151,35 @@ class Comment extends ActiveRecord
 		    'commnet_id' => Yii::t('users', 'ID'),
 		    'parent_id' => Yii::t('users', 'Parent Comment'),
 		    'from' => Yii::t('users', 'Author'),
+		    'to' => Yii::t('users', 'Reciver'),
                     'body' => Yii::t('users', 'Text'),
                     'create_time' => Yii::t('users', 'Time Create'),
 		];
 	}
 
-    /**
+        /**
 	 * @return \yii\db\ActiveRelation.
 	 */
 	public function getUser()
-    {
-        return $this->hasOne(User::className(), ['user_id' => 'from']);
-    }
+        {
+            return $this->hasOne(User::className(), ['user_id' => 'from']);
+        }
+        
+        /**
+	 * @return \yii\db\ActiveRelation.
+	 */
+	public function getReciever()
+        {
+            return $this->hasOne(User::className(), ['user_id' => 'to']);
+        }
 
-    /**
+        /**
 	 * @return \yii\db\ActiveRelation Parent Commet.
 	 */
 	public function getCommentParent()
-    {
-        return $this->hasOne(self::className(), ['comment_id' => 'parent_id']);
-    }
+        {
+            return $this->hasOne(self::className(), ['comment_id' => 'parent_id']);
+        }
 
 	/**
 	 * @inheritdoc

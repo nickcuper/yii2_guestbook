@@ -245,7 +245,7 @@ class User extends ActiveRecord implements IdentityInterface
 	}
 
 	/**
-	 * Выбор активного пользователя по [[username]]
+	 * Find Active user by login [[login]]
 	 * @param string $username
 	 */
 	public static function findActiveByLogin($login)
@@ -254,7 +254,7 @@ class User extends ActiveRecord implements IdentityInterface
 	}
 
 	/**
-	 * Выборка неактивного пользователя по [[username]]
+	 * Find InActive user by login [[login]]
 	 * @param string $username
 	 */
 	public static function findInactiveByLogin($login)
@@ -283,6 +283,9 @@ class User extends ActiveRecord implements IdentityInterface
 	 */
 	public function getFio($username = false)
 	{
+                if ($this->user_id == \Yii::$app->user->id)
+                    return Yii::t('users','Me');
+                    
 		if ($this->_fio === null) {
 			$this->_fio = $this->fname . ' ' . $this->lname;
 			if ($username !== false) {
