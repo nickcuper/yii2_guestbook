@@ -20,6 +20,17 @@ use app\extensions\fileapi\actions\DeleteAction;
 
 class DefaultController extends Controller
 {
+        /**
+	 * @inheritdoc
+	 */
+        public function init()
+        {
+                $this->on('beforeAction', function($event) {
+                    if (!Yii::$app->user->isGuest)  {
+                        Yii::$app->user->identity->countreplies = Comment::CountReply();
+                    }
+                });
+        }
 	/**
 	 * @inheritdoc
 	 */
@@ -239,7 +250,7 @@ class DefaultController extends Controller
 
 			if ($mUser->load(Yii::$app->request->post()) && $mUser->validate()) {
 			    // Redirect the user to the main page, and it notifies the successful completion of the request Restitution password.
-			    Yii::$app->session->setFlash('success', Yii::t('users', 'Ссылка для восстановления пароля, была отправлена на указанный вами электронный адрес.'));
+			    Yii::$app->session->setFlash('success', Yii::t('users', 'Link to reset your password has been sent to your specified email address.'));
 			    return $this->goHome();
 			}
 			
@@ -284,12 +295,14 @@ class DefaultController extends Controller
          */
         public function actionGuestbook($username = null) 
         {
-
+            
                 if ($username && $mUserByUsername = User::findActiveByLogin($username)) {
                     $userId = $mUserByUsername->user_id;
                 } else {
                     $userId = Yii::$app->user->id;
                 }
+                
+                Comment::changeStatus();
                 
                 return $this->render('guestbook', [
 				'user_id' => $userId,
@@ -306,11 +319,12 @@ class DefaultController extends Controller
             
 		$model = new Comment(['scenario' => 'create']);
 		Yii::$app->response->format = Response::FORMAT_JSON;
-
+                
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$level = Yii::$app->request->post('level');
                         // if Answer to other comment
 			$isAnswer = Yii::$app->request->post('is_answer');
+                        
 			if ($level !== null) {
 				$level = ($level < $this->module->maxLevel)
                                         ? $level + 1 : $this->module->maxLevel;
@@ -333,6 +347,13 @@ class DefaultController extends Controller
 			];
                         
 		} else {
+                    
+                         // TODO hard code remove later
+                        if (!Yii::$app->request->getIsAjax()) {
+                            Yii::$app->session->setFlash('danger', Yii::t('users', 'Please enter text'));
+                            return $this->redirect('/guestbook');
+                        }
+                    
 			return ['errors' => ActiveForm::validate($model)];
 		}
 	}

@@ -11,49 +11,49 @@ class Users extends Module
         public $controllerNamespace = 'app\modules\users\controllers';
 
 	/**
-	 * @var integer Количество записей на главной странице модуля.
+	 * @var integer Count items on page
 	 */
 	public $recordsPerPage = 18;
 
 	/**
-	 * @var boolean Если данное значение false, пользователи при регистрации должны будут подтверждать свои электронные адреса
+	 * @var boolean If this value is false, users will be required at check-in to confirm their e-mail addresses
 	 */
 	public $activeAfterRegistration = false;
 
 	/**
-	 * @var string Ссылка на которую будет перенаправляен пользователь после деавторизации.
+	 * @var string Link that will redirect the user after deauthorize.
 	 */
-	public $afterLogoutRedirectUrl = ['/site/index'];
+	public $afterLogoutRedirectUrl = ['my/settings/update'];
 
 	/**
-	 * @var array Доступные расширения загружаемых аватар-ов
+	 * @var array
 	 */
 	public $avatarAllowedExtensions = ['jpg', 'png', 'gif'];
 
 	/**
-	 * @var integer Ширина аватар-а пользователя
+	 * @var integer
 	 */
 	public $avatarWidth = 100;
 
 	/**
-	 * @var integer Высота аватар-а пользователя
+	 * @var integer
 	 */
 	public $avatarHeight = 100;
 
 	/**
-	 * @var integer Максимальная ширина аватар-а пользователя
+	 * @var integer
 	 */
 	public $avatarMaxWidth = 1000;
 
 	/**
-	 * @var integer Максимальная высота аватар-а пользователя
+	 * @var integer
 	 */
 	public $avatarMaxHeight = 1000;
 
 	/**
-	 * @var integer Максимальный размер загружаемого аватар-а
+	 * @var integer
 	 */
-	public $avatarMaxSize = 3145728; // 2*1024*1024 = 2MB
+	public $avatarMaxSize = 3145728; // 3*1024*1024 = 3MB
         
 	/**
 	 * @var integer
@@ -61,8 +61,8 @@ class Users extends Module
 	public $maxLevel = 1;
 
 	/**
-	 * @param string $image Имя изображения
-	 * @return string Путь к папке где хранятся аватар-ы или путь к конкретному аватар-у
+	 * @param string $image
+	 * @return string
 	 */
 	public function avatarPath($image = null)
 	{
@@ -74,8 +74,8 @@ class Users extends Module
 	}
 
 	/**
-	 * @param string $image Имя изображения
-	 * @return string Путь к временной папке где хранятся аватар-ы или путь к конкретному аватар-у
+	 * @param string $image
+	 * @return string
 	 */
 	public function avatarTempPath($image = null)
 	{
@@ -87,7 +87,7 @@ class Users extends Module
 	}
 
 	/**
-	 * @var string URL к папке где хранятся аватар-ы с публичным доступом.
+	 * @var string URL
 	 */
 	public function avatarUrl($image = null)
 	{
@@ -100,7 +100,7 @@ class Users extends Module
 	}
 
 	/**
-	 * @return string URL дефолтной аватар картинки.
+	 * @return string URL.
 	 */
 	public function avatarDefaultUrl() {
 		$url = '/images/default-avatar.png';
@@ -108,39 +108,39 @@ class Users extends Module
 	}
 
         /**
-	 * Отправляем ключ активации учётной записи на указаный при регистарции e-mail.
-	 * Вызывается только если $this->activeAfterRegistration = false.
+	 * Send activation key account at specified at registration e-mail.
+	 * Called only if $this->activeAfterRegistration = false.
 	 * @param User $event
 	 * @return boolean
 	 */
 	public function onSignup($event)
 	{
 		$model = $event->sender;
-                $subject = 'Активационный ключ - ' . Yii::$app->name;
+                $subject = Yii::t('users', 'Активационный ключ - ') . Yii::$app->name;
 		return $this->send($subject, $model['email'], 'users/signup', [ 'email' => $model['email'], 'key' => $model['auth_key']]);
 	}
 
 	/**
-	 * Данная функция срабатывает в момент повторной отправки кода активации, новому пользователю.
+	 * This function works when resending the activation code to the new user.
 	 * @param User $event
 	 * @return boolean
 	 */
 	public function onResend($event)
 	{
 		$model = $event->sender;
-                $subject = 'Активационный ключ - ' . Yii::$app->name;
+                $subject = Yii::t('users', 'Активационный ключ - ') . Yii::$app->name;
 		return $this->send($subject, $model['email'], 'users/signup', ['email' => $model['email'], 'key' => $model['auth_key']]);
 		
 	}
 
 	/**
-	 * Данная функция срабатывает в момент запроса восстановления пароля.
+	 * This function works in the time of the request password recovery.
 	 * @param User $event
 	 * @return boolean
 	 */
 	public function onRecoveryConfirm($event) {
 		$model = $event->sender;
-		$subject = 'Подтверждение смены пароля - ' . Yii::$app->name;
+		$subject = Yii::t('users', 'Подтверждение смены пароля - ') . Yii::$app->name;
 		return $this->send($subject, $model['email'], 'users/recovery-confirm', ['email' => $model['email'], 'key' => $model['auth_key']]);
 	}
         

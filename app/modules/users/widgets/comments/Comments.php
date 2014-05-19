@@ -4,6 +4,7 @@ namespace app\modules\users\widgets\comments;
 use Yii;
 use yii\base\Widget;
 use app\modules\users\models\Comment;
+
 use app\modules\users\widgets\comments\assets\CommentsAsset;
 use app\modules\users\widgets\comments\assets\CommentsGuestAsset;
 
@@ -80,7 +81,8 @@ class Comments extends Widget
 		$model = self::baseComment();
 		$models = $model->getComments();
 		$this->registerClientScript();
-		
+                Comment::changeStatus();
+                
     	echo $this->render('index', [
     		'id' => $this->getId(),
     		'model' => $model,
@@ -112,7 +114,7 @@ class Comments extends Widget
   	protected function baseComment()
 	{
 		$model = new Comment(['scenario' => 'create']);
-                $model->from = ($this->user_id) ? $this->user_id : Yii::$app->user->id;  
+                $model->from = $this->user_id;  
                 $model->to = (Yii::$app->user->id != $model->from) ? Yii::$app->user->id : 0;     
                 return $model;
 	}

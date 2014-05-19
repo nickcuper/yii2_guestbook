@@ -16,10 +16,10 @@ use app\modules\users\models\query\CommentQuery;
  * @property integer $parent_id
  * @property integer $to Reciver.
  * @property integer $from Author.
- * @property staring $body
+ * @property integer $status
+ * @property string $body
  * @property date $date_create
  * 
- * TODO add status field
  */
 class Comment extends ActiveRecord
 {
@@ -32,7 +32,12 @@ class Comment extends ActiveRecord
         /**
 	 * Key count answer cache
 	 */
-	const CACHE_USER_COUNT_MESSAGE = 'newMessage';
+	const CACHE_USER_COUNT_MESSAGE = 'countMessage';
+        
+        /**
+	 * Key count answer cache
+	 */
+	const CACHE_USER_COUNT_NEW_MESSAGE = 'newcountMessage';
         
 	/**
 	 * @var Uses for store structure 
@@ -56,14 +61,6 @@ class Comment extends ActiveRecord
 	{
 		return 'comments';
 	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function find()
-    {
-        return new CommentQuery(get_called_class());
-    }
 
 	/**
 	 * @return array or NULL.
@@ -125,7 +122,7 @@ class Comment extends ActiveRecord
 	public function rules()
 	{
 		return [
-			[['body'], 'required'],
+			[['body'], 'required' , 'on' => ['create']],
 			['parent_id', 'exist', 'targetAttribute' => 'comment_id']
 		];
 	}
@@ -153,6 +150,7 @@ class Comment extends ActiveRecord
 		    'from' => Yii::t('users', 'Author'),
 		    'to' => Yii::t('users', 'Reciver'),
                     'body' => Yii::t('users', 'Text'),
+                    'status' => Yii::t('users', 'Status'),
                     'create_time' => Yii::t('users', 'Time Create'),
 		];
 	}
@@ -172,13 +170,45 @@ class Comment extends ActiveRecord
         {
             return $this->hasOne(User::className(), ['user_id' => 'to']);
         }
-
+        
         /**
-	 * @return \yii\db\ActiveRelation Parent Commet.
+         * Cache counter
+         * TODO I think this not right way
+	 * @return int $value
 	 */
-	public function getCommentParent()
+	public function CountReply()
         {
-            return $this->hasOne(self::className(), ['comment_id' => 'parent_id']);
+            
+                $keyCountMessage = self::CACHE_USER_COUNT_MESSAGE;
+                $keyNewMessage = self::CACHE_USER_COUNT_NEW_MESSAGE;
+                
+		$valueNewMessage = Yii::$app->getCache()->get($keyNewMessage);
+		$valueCountMessge = Yii::$app->getCache()->get($keyCountMessage);
+                
+                $isvalueNewMessage = ($valueNewMessage === false || empty($valueNewMessage));
+                $isvalueCountMessage = ($valueCountMessge === false || empty($valueCountMessge));
+                $countMessage = Comment::find()->count();
+                
+		if (($isvalueNewMessage || $isvalueCountMessage) || ($countMessage != $valueCountMessge)) {
+			$valueNewMessage = Comment::find()
+                                ->where(['to' => Yii::$app->user->id, 'status' => self::STATUS_UNREAD])
+                                ->count();
+                        
+			Yii::$app->cache->set($keyCountMessage, $countMessage);
+			Yii::$app->cache->set($keyNewMessage, $valueNewMessage);
+		}
+		return $valueNewMessage;
+        }
+        
+        /**
+         * If reply Set all replies comments status READ
+         */
+        public function changeStatus() 
+        {
+                if ( Yii::$app->user->identity->countreplies ) {
+                        Comment::updateAll(['status' => self::STATUS_READ], 
+                                'status=' . self::STATUS_UNREAD . ' AND `to`=' . Yii::$app->user->id);
+                }
         }
 
 	/**
@@ -188,7 +218,6 @@ class Comment extends ActiveRecord
 	{
 		if (parent::beforeSave($insert)) {
 			if ($this->isNewRecord) {
-				
 				if (!$this->parent_id) {
 					$this->parent_id = 0;
 				}

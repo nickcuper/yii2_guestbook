@@ -46,8 +46,9 @@ AppAsset::register($this);
                         'url' => ['/users/default/update'],
                     ],
                     [
-                        'label' => Yii::t('users', 'My GuestBook'),
+                        'label' => Yii::t('users', 'My GuestBook <span class="badge {class}">{count}</span>', ['count' => Yii::$app->user->identity->countreplies, 'class' => 'label-info']),
                         'url' => ['/guestbook'],
+                        
                     ],
                     [
                         'label' => Yii::t('users', 'My Partners'),
@@ -64,6 +65,7 @@ AppAsset::register($this);
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => $menuItems,
+                'encodeLabels'=>false,
             ]);
             NavBar::end();
         ?>

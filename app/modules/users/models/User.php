@@ -27,13 +27,14 @@ use app\modules\users\models\query\UserQuery;
  * @property string $lname
  * @property string $avatar_url
  * @property integer $role_id
- * @property integer $is_active
- * @property integer $is_active
+ * @property integer $state_id
+ * @property integer $country_id
  * @property integer $date_register
  *
  * @property string $password
  * @property string $repassword
  * @property string $oldpassword
+ * @property int $countreplies
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -55,11 +56,6 @@ class User extends ActiveRecord implements IdentityInterface
 	const EVENT_AFTER_VALIDATE_SUCCESS = 'afterValidateSuccess';
 
 	/**
-	 * Key cache
-	 */
-	const CACHE_USERS_LIST_DATA = 'usersListData';
-
-	/**
 	 * @var string $username
 	 */
 	public $username;
@@ -78,6 +74,11 @@ class User extends ActiveRecord implements IdentityInterface
 	 * @var string $oldpassword
 	 */
 	public $oldpassword;
+        
+        /**
+	 * @var int $countreplies
+	 */
+	public $countreplies;
 
 	/**
 	 * @var string $_fio
@@ -99,7 +100,6 @@ class User extends ActiveRecord implements IdentityInterface
 	 * @var string 
 	 */
 	protected $_status;
-        
         
         /**
 	 * @inheritdoc
@@ -226,6 +226,7 @@ class User extends ActiveRecord implements IdentityInterface
         {
             return new UserQuery(get_called_class());
         }
+        
 	/**
 	 * Select user by [[user_id]]
 	 * @param integer $id
@@ -261,9 +262,9 @@ class User extends ActiveRecord implements IdentityInterface
 	{
 		return static::find()->where('login = :login', [':login' => $login])->inactive()->one();
 	}
-
-	/**
-	 * @return integer ID пользователя.
+	
+        /**
+	 * @return integer ID user.
 	 */
 	public function getId()
 	{
@@ -350,21 +351,6 @@ class User extends ActiveRecord implements IdentityInterface
 		    self::STATUS_ACTIVE => Yii::t('users', 'Active'),
 		    self::STATUS_INACTIVE => Yii::t('users', 'InActive')
 		];
-	}
-
-	/**Массив доступных ролей пользователя.
-	 * @return array [[DropDownList]] массив пользователей.
-	 */
-	public static function getUserArray()
-	{
-		$key = self::CACHE_USERS_LIST_DATA;
-		$value = Yii::$app->getCache()->get($key);
-		if ($value === false || empty($value)) {
-			$value = self::find()->select(['user_id', 'login'])->orderBy('login ASC')->asArray()->all();
-			$value = ArrayHelper::map($value, 'user_id', 'login');
-			Yii::$app->cache->set($key, $value);
-		}
-		return $value;
 	}
 
 	/**
@@ -479,5 +465,4 @@ class User extends ActiveRecord implements IdentityInterface
         {
             throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
         }
-
 }
