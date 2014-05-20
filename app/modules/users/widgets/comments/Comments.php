@@ -43,17 +43,17 @@ class Comments extends Widget
 	 * @var integer
 	 */
 	public $maxLevel = 1;
-        
+
         /**
 	 * @var integer This param uses via relation.
 	 */
         public $user_id;
-        
+
         /**
 	 * @var boolean
 	 */
         public $isAnswer;
-        
+
         /**
 	 * @inheritdoc
 	 */
@@ -82,7 +82,7 @@ class Comments extends Widget
 		$models = $model->getComments();
 		$this->registerClientScript();
                 Comment::changeStatus();
-                
+
     	echo $this->render('index', [
     		'id' => $this->getId(),
     		'model' => $model,
@@ -102,10 +102,10 @@ class Comments extends Widget
 	public function registerClientScript()
 	{
 		$view = $this->getView();
-		
+
 			CommentsAsset::register($view);
 			$view->registerJs("jQuery('#comment-form').comments();");
-		
+
 	}
 
   	/**
@@ -114,8 +114,8 @@ class Comments extends Widget
   	protected function baseComment()
 	{
 		$model = new Comment(['scenario' => 'create']);
-                $model->from = $this->user_id;  
-                $model->to = (Yii::$app->user->id != $model->from) ? Yii::$app->user->id : 0;     
+                $model->from = $this->user_id;
+                $model->to = (Yii::$app->user->id != $model->from) ? Yii::$app->user->id : 0;
                 return $model;
 	}
 }

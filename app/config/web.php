@@ -7,6 +7,8 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'extensions' => require(__DIR__ . '/../vendor/yiisoft/extensions.php'),
+    'sourceLanguage' => 'en',
+    'language' => 'ru',
     'modules' => [
 
 		'users' => [
@@ -22,11 +24,12 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'request' => [
-            'baseUrl' => '/'
+            'baseUrl' => '/',
+            'class' => 'app\extensions\langrequestmanager\LangRequestManager',
         ],
         'urlManager' => [
             'baseUrl' => '',
-
+            'class' => 'app\extensions\langurlmanager\LangUrlManager',
             'enablePrettyUrl' => true,
             'showScriptName' => true,
             'enableStrictParsing' => true,
@@ -40,13 +43,10 @@ $config = [
                     '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 
                     // Module Users
-                    // Widget Comments [[ Modules User ]]
-                    
                     '<_a:(login|logout|signup|activation|recovery|resend|avatar|partners|guestbook|comments)>' => 'users/default/<_a>',
                     'my/settings/<_a:[\w\-]+>' => 'users/default/<_a>',
                     '<_m:users>/<username:[a-zA-Z0-9_-]{3,20}+>' => '<_m>/default/view',
-                    
-                    
+
             ]
         ],
 
@@ -66,8 +66,8 @@ $config = [
 			'translations' => [
 				'users' => [
 					'class' => 'yii\i18n\PhpMessageSource',
-					'sourceLanguage' => 'en',
-					'basePath' => 'app/modules/users/messages',
+					'sourceLanguage' => 'ru',
+					'basePath' => '@app/modules/users/messages',
 				]
 			]
 		],

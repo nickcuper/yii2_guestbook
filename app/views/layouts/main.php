@@ -4,7 +4,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
-
+use app\widgets\NavBarLangList\NavBarLangList;
 /**
  * @var \yii\web\View $this
  * @var string $content
@@ -25,6 +25,7 @@ AppAsset::register($this);
 <?php $this->beginBody() ?>
     <div class="wrap">
         <?php
+
             NavBar::begin([
                 'brandLabel' => 'Yii2 Guestbook',
                 'brandUrl' => Yii::$app->homeUrl,
@@ -38,7 +39,7 @@ AppAsset::register($this);
                     ['label' => 'Register', 'url' => ['/signup']],
                     ['label' => 'Login', 'url' => ['/login']]
                 ];
-                
+
             } else {
                 $menuItems = [
                     [
@@ -48,7 +49,7 @@ AppAsset::register($this);
                     [
                         'label' => Yii::t('users', 'My GuestBook <span class="badge {class}">{count}</span>', ['count' => Yii::$app->user->identity->countreplies, 'class' => 'label-info']),
                         'url' => ['/guestbook'],
-                        
+
                     ],
                     [
                         'label' => Yii::t('users', 'My Partners'),
@@ -57,17 +58,21 @@ AppAsset::register($this);
                     [
                         'label' => 'Logout (' . Yii::$app->user->identity->login . ')',
                         'url' => ['/logout'],
-                    ]
+                        
+                    ],
+
                 ];
-                
+
             }
-             
-            echo Nav::widget([
+
+            echo NavBarLangList::widget([
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => $menuItems,
                 'encodeLabels'=>false,
+                'langList' => true,
             ]);
             NavBar::end();
+
         ?>
 
         <div class="container">

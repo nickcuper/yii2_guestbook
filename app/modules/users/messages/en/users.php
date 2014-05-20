@@ -1,2 +1,5 @@
-<?php 
-return [];
+<?php
+return [
+    'Add' => 'add EN',
+
+];
