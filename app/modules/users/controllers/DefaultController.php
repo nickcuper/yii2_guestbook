@@ -9,6 +9,8 @@ use yii\web\Controller;
 use yii\web\Response;
 use yii\helpers\Url;
 
+use app\controllers\AppController;
+
 // models
 use app\modules\users\models\User;
 use app\modules\users\models\Comment;
@@ -18,19 +20,11 @@ use app\modules\users\models\LoginForm;
 use app\extensions\fileapi\actions\UploadAction;
 use app\extensions\fileapi\actions\DeleteAction;
 
-class DefaultController extends Controller
+class DefaultController extends AppController
 {
-        /**
-	 * @inheritdoc
-	 */
-        public function init()
-        {
-                $this->on('beforeAction', function($event) {
-                    if (!Yii::$app->user->isGuest)  {
-                        Yii::$app->user->identity->countreplies = Comment::CountReply();
-                    }
-                });
-        }
+
+
+
 	/**
 	 * @inheritdoc
 	 */
@@ -114,7 +108,7 @@ class DefaultController extends Controller
 			    'pageSize' => $this->module->recordsPerPage
 			]
 		]);
-		
+
 		return $this->render('index', [
 			'dataProvider' => $dataProvider
 		]);
@@ -127,7 +121,7 @@ class DefaultController extends Controller
 	public function actionView($username)
 	{
 		if ($mUser = User::findActiveByLogin($username)) {
-			
+
 			return $this->render('view', [
 				'model' => $mUser
 			]);
@@ -150,17 +144,17 @@ class DefaultController extends Controller
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			// If needed activate account
 			if ($this->module->activeAfterRegistration === false) {
-				
+
 				Yii::$app->session->setFlash('success', Yii::t('users', 'Congratulations! Account was created and your email was sent mail with activation key'));
 			} else {
 				// Auth user and show message
 				Yii::$app->getUser()->login($model);
 				Yii::$app->session->setFlash('success', Yii::t('users', 'Congratulations! Account was created'));
 			}
-			
+
 			return $this->goHome();
 		}
-		
+
 		return $this->render('signup', [
 			'model' => $model
 		]);
@@ -174,13 +168,13 @@ class DefaultController extends Controller
 		if (!Yii::$app->user->isGuest) {
 			$this->goHome();
 		}
-                
+
 		$mLoginForm = new LoginForm;
-                
+
 		if ($mLoginForm->load(Yii::$app->request->post()) && $mLoginForm->login()) {
 			return $this->goBack();
-		}
-		
+                }
+
 		return $this->render('login', [
 			'model' => $mLoginForm
 		]);
@@ -209,10 +203,10 @@ class DefaultController extends Controller
 				Yii::$app->session->setFlash('success', Yii::t('users', 'Congratulations! Your Account was activate.'));
 			}
 		} else {
-			
+
 			Yii::$app->session->setFlash('danger', Yii::t('users', 'Oops! What happend Please contanct to admin'));
 		}
-		
+
 		return $this->goHome();
 	}
 
@@ -223,27 +217,9 @@ class DefaultController extends Controller
 	 */
 	public function actionRecovery($email = false, $key = false)
 	{
-		
-		if ($email && $key) {
-			
-			if ($mUser = User::find()->where(['and', 'email = :email', 'auth_key = :auth_key'], [':email' => $email, ':auth_key' => $key])->active()->one()) {
-				$mUser->setScenario('recovery');
-				// add Event Handler for send email
-				$mUser->on(User::EVENT_AFTER_UPDATE, [$this->module, 'onRecoveryPassword']);
+                // render page with form if not found params
+		if (!$email && !$key) {
 
-				if ($mUser->save(false)) {
-					// In case of a successful password recovery, redirect the user to the main page, and notifies the user about the successful completion of the recovery process.
-					Yii::$app->session->setFlash('success', Yii::t('users', 'Password has been successfully restored and sent to the specified email address. Please check the mail!'));
-				}
-			} else {
-				// In case of the user with the given arguments do not exist in the database, alerting the user of the error.
-				Yii::$app->session->setFlash('danger', Yii::t('users', 'Неправильный запрос подтверждения смены пароля. Пожалуйста попробуйте ещё раз!'));
-			}
-			
-			return $this->goHome();
-
-		
-		} else {
 			$mUser = new User(['scenario' => 'recovery']);
 			// Add an event handler that sends a message with a key to the password change e-mail address of the user.
 			$mUser->on(User::EVENT_AFTER_VALIDATE_SUCCESS, [$this->module, 'onRecoveryConfirm']);
@@ -253,10 +229,30 @@ class DefaultController extends Controller
 			    Yii::$app->session->setFlash('success', Yii::t('users', 'Link to reset your password has been sent to your specified email address.'));
 			    return $this->goHome();
 			}
-			
+
 			return $this->render('recovery', [
 				'model' => $mUser
 			]);
+
+		} else {
+
+                        // Check params and try recovery password
+                        if ($mUser = User::find()->where(['and', 'email = :email', 'auth_key = :auth_key'], [':email' => $email, ':auth_key' => $key])->active()->one()) {
+                                    $mUser->setScenario('recovery');
+                                    // add Event Handler for send email
+                                    $mUser->on(User::EVENT_AFTER_UPDATE, [$this->module, 'onRecoveryPassword']);
+
+                                    if ($mUser->save(false)) {
+                                            // In case of a successful password recovery, redirect the user to the main page, and notifies the user about the successful completion of the recovery process.
+                                            Yii::$app->session->setFlash('success', Yii::t('users', 'Password has been successfully restored and sent to the specified email address. Please check the mail!'));
+                                    }
+                            } else {
+                                    // In case of the user with the given arguments do not exist in the database, alerting the user of the error.
+                                    Yii::$app->session->setFlash('danger', Yii::t('users', 'Неправильный запрос подтверждения смены пароля. Пожалуйста попробуйте ещё раз!'));
+                            }
+
+                            return $this->goHome();
+
 		}
 	}
 
@@ -265,14 +261,14 @@ class DefaultController extends Controller
 	 */
 	public function actionUpdate()
 	{
-		// Get current user 
+		// Get current user
 		if ($mUser = User::findOne(Yii::$app->user->id)) {
 			$mUser->setScenario('update');
 
 			if ($mUser->load(Yii::$app->request->post()) && $mUser->save()) {
 				Yii::$app->session->setFlash('success', Yii::t('users', 'Profile was updated'));
 			}
-			
+
 			return $this->render('update', [
 				'model' => $mUser,
 			]);
@@ -288,56 +284,56 @@ class DefaultController extends Controller
 		$mUser->setScenario('delete-avatar');
 		$mUser->save(false);
 	}
-       
+
         /**
-         * Show comment, if username is Null show my comments 
+         * Show comment, if username is Null show my comments
          * @param string $username Login user
          */
-        public function actionGuestbook($username = null) 
+        public function actionGuestbook($username = null)
         {
-            
+
                 if ($username && $mUserByUsername = User::findActiveByLogin($username)) {
                     $userId = $mUserByUsername->user_id;
                 } else {
                     $userId = Yii::$app->user->id;
                 }
-                
+
                 Comment::changeStatus();
-                
+
                 return $this->render('guestbook', [
 				'user_id' => $userId,
 				'login' => $username,
 			]);
         }
-        
-        
+
+
         /**
 	 * Create new comment
 	 */
 	public function actionComments()
 	{
-            
+
 		$model = new Comment(['scenario' => 'create']);
 		Yii::$app->response->format = Response::FORMAT_JSON;
-                
+
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			$level = Yii::$app->request->post('level');
                         // if Answer to other comment
 			$isAnswer = Yii::$app->request->post('is_answer');
-                        
+
 			if ($level !== null) {
 				$level = ($level < $this->module->maxLevel)
                                         ? $level + 1 : $this->module->maxLevel;
 			} else {
 				$level = 0;
 			}
-                        
+
                         // TODO hard code remove later
                         if (!$isAnswer) {
                             Yii::$app->session->setFlash('success', Yii::t('users', 'Comment was added'));
                             return $this->redirect('/guestbook');
                         }
-                        
+
 			return [
 			    'success' => $this->renderPartial('@app/modules/users/widgets/comments/views/_index_item', [
 			    	'model' => $model,
@@ -345,15 +341,15 @@ class DefaultController extends Controller
 			    	'maxLevel' => $this->module->maxLevel
 			    ])
 			];
-                        
+
 		} else {
-                    
+
                          // TODO hard code remove later
                         if (!Yii::$app->request->getIsAjax()) {
                             Yii::$app->session->setFlash('danger', Yii::t('users', 'Please enter text'));
                             return $this->redirect('/guestbook');
                         }
-                    
+
 			return ['errors' => ActiveForm::validate($model)];
 		}
 	}

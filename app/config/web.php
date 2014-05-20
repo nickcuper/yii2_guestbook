@@ -8,7 +8,7 @@ $config = [
     'bootstrap' => ['log'],
     'extensions' => require(__DIR__ . '/../vendor/yiisoft/extensions.php'),
     'sourceLanguage' => 'en',
-    'language' => 'ru',
+    'language' => 'en',
     'modules' => [
 
 		'users' => [
@@ -25,11 +25,11 @@ $config = [
         ],
         'request' => [
             'baseUrl' => '/',
-            'class' => 'app\extensions\langrequestmanager\LangRequestManager',
+           
         ],
         'urlManager' => [
             'baseUrl' => '',
-            'class' => 'app\extensions\langurlmanager\LangUrlManager',
+
             'enablePrettyUrl' => true,
             'showScriptName' => true,
             'enableStrictParsing' => true,

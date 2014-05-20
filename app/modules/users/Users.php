@@ -54,7 +54,7 @@ class Users extends Module
 	 * @var integer
 	 */
 	public $avatarMaxSize = 3145728; // 3*1024*1024 = 3MB
-        
+
 	/**
 	 * @var integer
 	 */
@@ -95,7 +95,7 @@ class Users extends Module
 		if ($image !== null) {
 			$url .= $image;
 		}
-		
+
 		return $url;
 	}
 
@@ -116,7 +116,7 @@ class Users extends Module
 	public function onSignup($event)
 	{
 		$model = $event->sender;
-                $subject = Yii::t('users', 'Активационный ключ - ') . Yii::$app->name;
+                $subject = Yii::t('users', 'Activation Key');
 		return $this->send($subject, $model['email'], 'users/signup', [ 'email' => $model['email'], 'key' => $model['auth_key']]);
 	}
 
@@ -128,9 +128,9 @@ class Users extends Module
 	public function onResend($event)
 	{
 		$model = $event->sender;
-                $subject = Yii::t('users', 'Активационный ключ - ') . Yii::$app->name;
+                $subject = Yii::t('users', 'Activation Key');
 		return $this->send($subject, $model['email'], 'users/signup', ['email' => $model['email'], 'key' => $model['auth_key']]);
-		
+
 	}
 
 	/**
@@ -140,10 +140,10 @@ class Users extends Module
 	 */
 	public function onRecoveryConfirm($event) {
 		$model = $event->sender;
-		$subject = Yii::t('users', 'Подтверждение смены пароля - ') . Yii::$app->name;
+		$subject = Yii::t('users', 'Confirm password change');
 		return $this->send($subject, $model['email'], 'users/recovery-confirm', ['email' => $model['email'], 'key' => $model['auth_key']]);
 	}
-        
+
         /**
          * Send mail with params
 	 * @var string $subject
@@ -153,7 +153,7 @@ class Users extends Module
 	 * @var array $params
 	 */
 	protected function send($subject, $to, $view = null, $params = [], $from = null)
-	{   
+	{
 		$from = ($from !== null) ? $from : [Yii::$app->params['suportEmail'] => Yii::$app->name . ' - suport'];
 		Yii::$app->mail
 		         ->compose($view, $params)

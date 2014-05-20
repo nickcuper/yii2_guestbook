@@ -5,6 +5,7 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\widgets\NavBarLangList\NavBarLangList;
+use app\widgets\alert\Alert;
 /**
  * @var \yii\web\View $this
  * @var string $content
@@ -28,7 +29,7 @@ AppAsset::register($this);
 
             NavBar::begin([
                 'brandLabel' => 'Yii2 Guestbook',
-                'brandUrl' => Yii::$app->homeUrl,
+                'brandUrl' => '/',
                 'options' => [
                     'class' => 'navbar-inverse navbar-fixed-top',
                 ],
@@ -36,8 +37,8 @@ AppAsset::register($this);
 
             if (Yii::$app->user->isGuest) {
                 $menuItems = [
-                    ['label' => 'Register', 'url' => ['/signup']],
-                    ['label' => 'Login', 'url' => ['/login']]
+                    ['label' => Yii::t('users', 'Register'), 'url' => ['/signup']],
+                    ['label' => Yii::t('users', 'Login'), 'url' => ['/login']]
                 ];
 
             } else {
@@ -56,9 +57,9 @@ AppAsset::register($this);
                         'url' => ['/partners'],
                     ],
                     [
-                        'label' => 'Logout (' . Yii::$app->user->identity->login . ')',
+                        'label' => Yii::t('users', 'Logout [{name}]' , ['name' => Yii::$app->user->identity->login]),
                         'url' => ['/logout'],
-                        
+
                     ],
 
                 ];
@@ -79,6 +80,7 @@ AppAsset::register($this);
             <?= Breadcrumbs::widget([
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             ]) ?>
+            <?= Alert::widget();?>
             <?= $content ?>
         </div>
     </div>

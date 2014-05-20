@@ -1,3 +1,15 @@
+-- phpMyAdmin SQL Dump
+-- version 4.0.5
+-- http://www.phpmyadmin.net
+--
+-- Host: localhost
+-- Generation Time: May 21, 2014 at 12:38 AM
+-- Server version: 5.5.34-0ubuntu0.12.10.1
+-- PHP Version: 5.4.6-1ubuntu1.4
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
 --
 -- Database: `guestbook`
 --
@@ -15,26 +27,8 @@ CREATE TABLE IF NOT EXISTS `comments` (
   `body` varchar(255) DEFAULT NULL,
   `date_create` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`comment_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=42 ;
 
---
--- Dumping data for table `comments`
---
-
-INSERT INTO `comments` (`comment_id`, `from`, `parent_id`, `body`, `date_create`) VALUES
-(1, 5, 0, 'asdasdasdasd', '2014-05-18 12:29:19'),
-(2, 5, 0, 'asdasddas1', '2014-05-18 19:24:53'),
-(3, 5, 1, 'asdasddas1', '2014-05-18 21:20:00'),
-(4, 5, 1, 'asdasddas1', '2014-05-18 21:20:00'),
-(5, 12, 0, 'asdasdasdasd', '2014-05-18 12:29:19'),
-(9, 12, 5, 'jhh', '2014-05-18 22:12:02'),
-(10, 12, 5, 'khkh', '2014-05-18 22:12:46'),
-(11, 12, 5, 'khkh', '2014-05-18 22:17:58'),
-(12, 12, 5, 'jhnkjhn', '2014-05-18 22:18:19'),
-(13, 12, 5, '5646', '2014-05-18 22:19:49'),
-(14, 12, 5, '8952', '2014-05-18 22:20:11'),
-(15, 12, 0, 'sadasd', '2014-05-18 22:20:11'),
-(16, 12, 15, '45555', '2014-05-18 22:21:47');
 
 -- --------------------------------------------------------
 
@@ -73,8 +67,8 @@ CREATE TABLE IF NOT EXISTS `roles` (
 --
 
 INSERT INTO `roles` (`role_id`, `name`) VALUES
-(1, 'admin'),
-(2, 'user');
+(1, 'Admin'),
+(2, 'User');
 
 -- --------------------------------------------------------
 
@@ -84,22 +78,22 @@ INSERT INTO `roles` (`role_id`, `name`) VALUES
 
 CREATE TABLE IF NOT EXISTS `state` (
   `state_id` int(11) NOT NULL AUTO_INCREMENT,
-  `country_id` tinyint(3) NOT NULL,
-  `name` varchar(64) NOT NULL,
-  PRIMARY KEY (`state_id`),
-  KEY `country_id` (`country_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+  `country_id` int(10) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`state_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `state`
 --
 
 INSERT INTO `state` (`state_id`, `country_id`, `name`) VALUES
-(1, 1, 'Kievksaya'),
-(2, 2, 'Mazowieckie'),
-(3, 1, 'Donetckaya'),
-(4, 2, 'Dolnośląskie'),
-(5, 2, 'Lubelskie');
+(1, 1, 'Kievskaya'),
+(2, 2, 'Poland'),
+(3, 1, 'Dnepropetrovskaya'),
+(4, 1, 'Kharkovskaya'),
+(5, 1, 'Zaporojskaya'),
+(6, 1, 'Poland1');
 
 -- --------------------------------------------------------
 
@@ -111,32 +105,35 @@ CREATE TABLE IF NOT EXISTS `user` (
   `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `login` varchar(255) NOT NULL,
   `password` varchar(32) NOT NULL,
-  `password_hash` varchar(128) NOT NULL,
+  `password_hash` varchar(128) DEFAULT NULL,
+  `auth_key` varchar(128) NOT NULL,
   `email` varchar(255) NOT NULL,
   `fname` varchar(80) DEFAULT NULL,
   `lname` varchar(80) DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `role_id` tinyint(2) unsigned NOT NULL DEFAULT '2',
   `state_id` tinyint(3) unsigned DEFAULT NULL,
-  `country_id` tinyint(3) DEFAULT NULL,
-  `auth_key` varchar(128) DEFAULT NULL,
-  `wmr` varchar(20) DEFAULT NULL,
+  `country_id` int(10) DEFAULT '0',
+  `avatar_url` varchar(80) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
-  `avatar_url` varchar(128) DEFAULT NULL,
+  `wmr` varchar(20) DEFAULT NULL,
   `date_register` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `login` (`login`),
   UNIQUE KEY `email` (`email`),
+  KEY `state_id` (`state_id`),
   KEY `idx_role_id` (`role_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`user_id`, `login`, `password`, `password_hash`, `email`, `fname`, `lname`, `is_active`, `role_id`, `state_id`, `country_id`, `auth_key`, `wmr`, `phone`, `avatar_url`, `date_register`) VALUES
-(5, 'admin', '', '$2y$13$BcE3.ShAg2XwJXDjMSsbV..3eq5cyxf.SiPPU1XlSvuGMjBfsRTAW', '55dmitrii@gmail.com', 'adminchik', 'admin', 1, 2, NULL, 0, 'Kgo5GWkcbIos1MempFWV8gxM_JJLBACb', NULL, '02369', '53789ed3ced86.jpg', NULL),
-(12, 'admin1', '', '$2y$13$Jw8X28DQdMYjVOSW.dMDIOwnR9XHfuIBcZxoTvPoGCF8Q2D/Ux7j2', '5512dmitrii@gmail.com', 'sadas', 'sadasd', 1, 2, 3, 1, 'Mh9HkdOfJ-qAv0xXgN5o8UbjtrTZ-lQM', '541646456', '654646', NULL, NULL);
+INSERT INTO `user` (`user_id`, `login`, `password`, `password_hash`, `auth_key`, `email`, `fname`, `lname`, `is_active`, `role_id`, `state_id`, `country_id`, `avatar_url`, `address`, `phone`, `wmr`, `date_register`) VALUES
+(2, 'admin', '', '$2y$13$CWHHaH9gQ6ys6doqSn0i1uQkkPp2azwVmo8Jgz6r9v7D86HJBTMZS', '587MURjSAl7i070ZJJgZ7T0Co91ojnx9', '55dmitrii@gmail.com', 'DM', 'PT', 1, 1, NULL, NULL, '537b964d88341.png', NULL, '', NULL, NULL),
+(3, 'dmitrii', '', '$2y$13$CWHHaH9gQ6ys6doqSn0i1uQkkPp2azwVmo8Jgz6r9v7D86HJBTMZS', '587MURjSAl7i070ZJJgZ7T0Co91ojnx9', 'nick@multinet.dp.ua', 'dmitrii', 'dmirt', 0, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(4, 'dmitrii1', '', '$2y$13$v10B8TgIzzR0It7yJsWuAemE4czkFWsXwKT/F3TKhlrxWEnT7SGCS', 'LxUwQKe0rPrWJ2ANj22eojjlyuKzdX-C', 'nickl@mail.com', 'dmitrii', 'dmitrii', 1, 2, 2, 2, NULL, NULL, '123456', '123456', NULL);
 
 --
 -- Constraints for dumped tables

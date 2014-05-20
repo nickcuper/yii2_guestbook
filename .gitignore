@@ -1,6 +1,13 @@
 assets/*
 !assets/.gitignore
-protected/runtime/*
-!protected/runtime/.gitignore
-protected/data/*.db
-themes/classic/views/
+app/runtime/*
+!app/runtime/.gitignore
+
+app/uploads/avatars/*
+!app/uploads/avatars/.gitignore
+
+app/uploads/tmp/*
+!app/uploads/tmp/.gitignore
+
+app/uploads/tmp/avatars/*
+!app/uploads/tmp/avatars/.gitignore

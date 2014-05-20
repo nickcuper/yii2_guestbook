@@ -4,9 +4,9 @@ return [
     'adminEmail' => 'admin@example.com',
     'suportEmail' => 'suport@example.com',
     'listLanguages' =>  [
-            'ru'=> 'Russian',
             'en'=> 'English',
+            'ru'=> 'Russian',
             'pl'=> 'Poland',
     ],
-    'defaultLanguges' => 'ru',
+    'defaultLanguges' => 'en',
 ];

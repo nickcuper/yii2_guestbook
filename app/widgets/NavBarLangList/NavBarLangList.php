@@ -28,29 +28,15 @@ class NavBarLangList extends \yii\bootstrap\Nav
      */
     protected function langugesList()
     {
-        // current url
-        $currentUrl = ltrim(Yii::$app->request->url, '/');
-
-        $enabled = (bool) (sizeof(Yii::$app->params['listLanguages']) > 1);
-        $items = array();
-        $listLang = array();
-
-        // build list of languges
-        foreach (Yii::$app->params['listLanguages'] as $lang => $name)
-        {
-                if ($lang === Yii::$app->params['defaultLanguges']) {
-                        $suffix = '';
-                        $listLang[$suffix] = $enabled ? $name : '';
-                } else {
-                        $suffix = '_' . $lang;
-                        $listLang[$suffix] = $name;
-                }
-        }
-
         // create list items
-        foreach ($listLang as $suffix => $name) {
-                $url = '/' . ($suffix ? trim($suffix, '_') . '/' : '') . $currentUrl;
-                $items[] = ['label'=> $name.'['.$url, 'url' => [$url], 'active' => ($suffix) ? false: true];
+        foreach (Yii::$app->params['listLanguages'] as $suffix => $name) {
+                $items[] = ['label'=> $name, 'url' => ['#'],
+                    'active' => (($suffix == Yii::$app->language) ? TRUE: FALSE),
+                    'linkOptions' => [
+                        'data-lang' => $suffix,
+                        'class' => 'langLink',
+                        'onclick' => 'return false;'
+                        ]];
         }
 
         return ['label' => 'Lang ['.Yii::$app->language .']', 'url' => ['#'], 'items' => $items];
@@ -66,6 +52,7 @@ class NavBarLangList extends \yii\bootstrap\Nav
 
         if ($this->langList) {
             $this->items = ArrayHelper::merge($this->items, [$this->langugesList()]);
+            $this->registerClientScript();
         }
 
         foreach ($this->items as $i => $item) {
@@ -78,6 +65,29 @@ class NavBarLangList extends \yii\bootstrap\Nav
 
         return Html::tag('ul', implode("\n", $items), $this->options);
     }
+
+    /**
+    * Register AssetBundle widget.
+    */
+   public function registerClientScript()
+   {
+           $view = $this->getView();
+
+                   BootstrapPluginAsset::register($view);
+
+                   $view->registerJs("jQuery(document).on('click', '.langLink', function(evt) {
+                    lang = jQuery(this).data('lang');
+                    jQuery.post('/',{_lang:lang}, function(data) {
+                        if (data) {
+                            location.reload();
+                        }
+                    });
+
+});");
+
+   }
+
+
 
 }
 

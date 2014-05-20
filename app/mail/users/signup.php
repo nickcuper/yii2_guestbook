@@ -10,5 +10,5 @@ use yii\helpers\Html;
 
 $url = Yii::$app->urlManager->createAbsoluteUrl(['users/default/activation', 'key' => $key, 'email' => $email]);
 ?>
-<h3>Здравствуйте!</h3>
-<p>Для того чтобы закончить процесс регистрации вам нужно подтвердить ваш электронный адрес, для этого вы должны перейти по ссылке: <?= Html::a(Html::encode($url), $url) ?>.</p>
+<h3><?= Yii::t('users','Hello!')?></h3>
+<p><?= Yii::t('users', 'In order to complete the registration process you need to confirm your email address, for this you need to link')?>: <?= Html::a(Html::encode($url), $url) ?>.</p>

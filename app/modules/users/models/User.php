@@ -59,7 +59,7 @@ class User extends ActiveRecord implements IdentityInterface
 	 * @var string $username
 	 */
 	public $username;
-	
+
         /**
 	 * @var string $password
 	 */
@@ -74,7 +74,7 @@ class User extends ActiveRecord implements IdentityInterface
 	 * @var string $oldpassword
 	 */
 	public $oldpassword;
-        
+
         /**
 	 * @var int $countreplies
 	 */
@@ -97,10 +97,10 @@ class User extends ActiveRecord implements IdentityInterface
 	protected $_role;
 
 	/**
-	 * @var string 
+	 * @var string
 	 */
 	protected $_status;
-        
+
         /**
 	 * @inheritdoc
 	 */
@@ -120,7 +120,7 @@ class User extends ActiveRecord implements IdentityInterface
 			['email', 'email', 'on' => ['signup', 'resend', 'recovery']],
 			['email', 'string', 'max' => 100, 'on' => ['signup', 'resend', 'recovery']],
 			['email', 'unique', 'on' => ['signup']],
-			['email', 'exist', 'on' => ['resend', 'recovery'], 'message' => Yii::t('users', 'User exist in the system')],
+			#['email', 'exist', 'on' => ['resend', 'recovery'], 'message' => Yii::t('users', 'User exist in the system')],
 
 			// Password [[password]]
 			['password', 'required', 'on' => ['signup', 'login', 'password']],
@@ -142,7 +142,7 @@ class User extends ActiveRecord implements IdentityInterface
 			[['fname', 'lname'], 'string', 'max' => 50, 'on' => ['signup', 'update']],
 			['fname', 'match', 'pattern' => '/^[a-z]+$/iu', 'on' => ['signup', 'update']],
 			['lname', 'match', 'pattern' => '/^[a-z]+(-[a-z]+)?$/iu', 'on' => ['signup', 'update']],
-                    
+
                         // WMR & Phone Country and State
                         [['wmr', 'phone','country_id', 'state_id'], 'required', 'on' => 'signup'],
 		];
@@ -163,7 +163,7 @@ class User extends ActiveRecord implements IdentityInterface
 			'recovery' => ['email'],
 			'password' => ['password', 'repassword', 'oldpassword'],
 			'delete-avatar' => [],
-			
+
 		];
 	}
 
@@ -190,7 +190,7 @@ class User extends ActiveRecord implements IdentityInterface
                         'date_register' => Yii::t('users', 'Date Register'),
 		];
 	}
-        
+
 	/**
 	 * @inheritdoc
 	 */
@@ -226,7 +226,7 @@ class User extends ActiveRecord implements IdentityInterface
         {
             return new UserQuery(get_called_class());
         }
-        
+
 	/**
 	 * Select user by [[user_id]]
 	 * @param integer $id
@@ -262,7 +262,7 @@ class User extends ActiveRecord implements IdentityInterface
 	{
 		return static::find()->where('login = :login', [':login' => $login])->inactive()->one();
 	}
-	
+
         /**
 	 * @return integer ID user.
 	 */
@@ -286,7 +286,7 @@ class User extends ActiveRecord implements IdentityInterface
 	{
                 if ($this->user_id == \Yii::$app->user->id)
                     return Yii::t('users','Me');
-                    
+
 		if ($this->_fio === null) {
 			$this->_fio = $this->fname . ' ' . $this->lname;
 			if ($username !== false) {
@@ -397,7 +397,7 @@ class User extends ActiveRecord implements IdentityInterface
 	 */
 	public function afterValidate()
 	{
-		
+
 		if (!$this->hasErrors() && ($this->scenario === 'resend' || $this->scenario === 'recovery')) {
 			$event = new ModelEvent;
 			$event->sender = self::find()->where(['email' => $this->email])->one();
@@ -412,13 +412,13 @@ class User extends ActiveRecord implements IdentityInterface
 	public function beforeSave($insert)
 	{
 		if (parent::beforeSave($insert)) {
-			
+
 			if ($this->isNewRecord) {
-				
+
 				if (!empty($this->password)) {
 					$this->password_hash = Security::generatePasswordHash($this->password);
 				}
-				
+
 				if (!$this->is_active) {
 					if (Yii::$app->getModule('users')->activeAfterRegistration) {
 						$this->is_active = self::STATUS_ACTIVE;
@@ -426,42 +426,42 @@ class User extends ActiveRecord implements IdentityInterface
 						$this->is_active = self::STATUS_INACTIVE;
 					}
 				}
-				
+
 				$this->auth_key = Security::generateRandomKey();
 			} else {
-				
+
 				if ($this->scenario === 'activation') {
 					$this->is_active = self::STATUS_ACTIVE;
 					$this->auth_key = Security::generateRandomKey();
 				}
-				
+
 				if ($this->scenario === 'recovery') {
 					$this->password = Security::generateRandomKey(8);
 					$this->auth_key = Security::generateRandomKey();
 					$this->password_hash = Security::generatePasswordHash($this->password);
 				}
-				
+
 				if ($this->scenario === 'password') {
 					$this->password_hash = Security::generatePasswordHash($this->password);
 				}
-				
+
 				if ($this->scenario === 'delete-avatar') {
 					$avatar = Yii::$app->getModule('users')->avatarPath($this->avatar_url);
 					if (is_file($avatar) && unlink($avatar)) {
 						$this->avatar_url = '';
 					}
 				}
-				
+
 			}
 			return true;
 		}
 		return false;
 	}
-        
+
         /**
         * @inheritdoc
         */
-        public static function findIdentityByAccessToken($token, $type = null) 
+        public static function findIdentityByAccessToken($token, $type = null)
         {
             throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
         }

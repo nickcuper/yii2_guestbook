@@ -2,17 +2,21 @@
 
 namespace app\controllers;
 
+
+
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
+use app\controllers\AppController;
 
 use app\models\ContactForm;
 use app\models\State;
 
-class SiteController extends Controller
+class SiteController extends AppController
 {
+
     public function behaviors()
     {
         return [
@@ -46,7 +50,7 @@ class SiteController extends Controller
                 'class' => 'yii\captcha\CaptchaAction',
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
-            
+
         ];
     }
 
@@ -73,21 +77,21 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
-    
+
     /**
      * @return json
      */
-    public function actionState() 
+    public function actionState()
     {
-        
+
         $arrayState = [];
         $mState = State::findAll(['country_id'=>Yii::$app->request->post('country_id')]);
 
-        foreach ($mState as $state) 
+        foreach ($mState as $state)
         {
             $arrayState[] =['name' => $state->name, 'state_id' => $state->state_id];
         }
-        
+
         echo Json::encode($arrayState);
     }
 
