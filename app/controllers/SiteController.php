@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use app\controllers\AppController;
@@ -81,15 +80,8 @@ class SiteController extends AppController
      */
     public function actionState()
     {
-
-        $arrayState = [];
-        $mState = State::findAll(['country_id'=>Yii::$app->request->post('country_id')]);
-
-        foreach ($mState as $state)
-        {
-            $arrayState[] =['name' => $state->name, 'state_id' => $state->state_id];
-        }
-
+        $arrayState = State::getStatesArray(Yii::$app->request->post('country_id'));
+        
         echo Json::encode($arrayState);
     }
 

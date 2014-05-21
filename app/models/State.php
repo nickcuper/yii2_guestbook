@@ -14,6 +14,11 @@ use Yii;
 class State extends \yii\db\ActiveRecord
 {
     /**
+     * Key chache
+     */
+    const CACHE_STATE_LIST_DATA = 'arrayOfStates';
+
+    /**
      * @inheritdoc
      */
     public static function tableName()
@@ -43,5 +48,27 @@ class State extends \yii\db\ActiveRecord
             'country_id' => Yii::t('app', 'Country ID'),
             'name' => Yii::t('app', 'Name'),
         ];
+    }
+    
+    /**
+     * Return list of state 
+     * @param int $country_id Id country
+     * @return array ['name' => '{name}', 'state_id' => {state_id}]
+     */
+    public static function getStatesArray($country_id)
+    {
+     
+            $key = self::CACHE_STATE_LIST_DATA . $country_id;
+            $value = Yii::$app->getCache()->get($key);
+            if ($value === false || empty($value)) {
+                    $value = self::find()
+                            ->select(['state_id', 'name'])
+                            ->where(['country_id'=> $country_id])
+                            ->orderBy('name ASC')
+                            ->asArray()->all();
+
+                    Yii::$app->cache->set($key, $value);
+            }
+            return $value;
     }
 }
