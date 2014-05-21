@@ -20,10 +20,12 @@ use app\modules\users\models\LoginForm;
 use app\extensions\fileapi\actions\UploadAction;
 use app\extensions\fileapi\actions\DeleteAction;
 
+/**
+ * Base Controller Users Module
+ */
+
 class DefaultController extends AppController
 {
-
-
 
 	/**
 	 * @inheritdoc

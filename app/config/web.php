@@ -20,13 +20,29 @@ $config = [
 		],
     ],
     'components' => [
+
         'cache' => [
-            'class' => 'yii\caching\FileCache',
+           # 'class' => 'yii\caching\FileCache',
+            'class' => 'yii\caching\MemCache',
+            'servers' => [
+                  [
+                     'host' => '127.0.0.1',
+                     'port' => 11211,
+                      #'weight' => 60,
+                  ],
+                  /*[
+                     'host' => '127.0.0.1',
+                     'port' => 11211,
+                     'weight' => 40,
+                  ],*/
+              ],
         ],
+
         'request' => [
             'baseUrl' => '/',
-           
+
         ],
+
         'urlManager' => [
             'baseUrl' => '',
 
@@ -42,10 +58,15 @@ $config = [
                     '<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
                     '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 
+                    // Module Api
+                    'api/request/<_a:(run)>' => 'api/default/<_a>',
+
                     // Module Users
                     '<_a:(login|logout|signup|activation|recovery|resend|avatar|partners|guestbook|comments)>' => 'users/default/<_a>',
                     'my/settings/<_a:[\w\-]+>' => 'users/default/<_a>',
                     '<_m:users>/<username:[a-zA-Z0-9_-]{3,20}+>' => '<_m>/default/view',
+
+
 
             ]
         ],
